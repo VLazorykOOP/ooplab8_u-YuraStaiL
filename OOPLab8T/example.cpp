@@ -1,12 +1,11 @@
 #include "example.h"
 #include <string.h>
+#include <cstring>
+#include <algorithm>
 #include <iostream>
-namespace Fun {
-    // Написати функцію - шаблон послідовного пошуку в максимального серед 4 елементів.
-// Написати специфікацію функції - шаблон для типу char* .
-// Розробити програму тестування шаблона для декількох типів 
-// та специфікації доданого шаблона.   
-////
+#include <vector>
+#include <stdexcept>
+namespace Task1 {
 
 
  //using namespace std;
@@ -15,159 +14,403 @@ namespace Fun {
     using std::ostream;
     using std::istream;
 
-    class TLong {    //  long long 8 -byte
-        long long hi, lo;  // 16 byte 
-    public:
-        TLong() :hi(0), lo(0) {}
-        TLong(long long h, long long l) :hi(h), lo(l) {}
-        TLong& operator = (const TLong& s) {
-            hi = s.hi; lo = s.lo; return *this;
-        };
-        bool      operator > (const TLong& s) {
-            if (hi > s.hi) return true;
-            if (hi == s.hi && lo >= s.lo) return true;
-            return false;
+    template<typename T>
+    void findMinAndCount(T arr[], int size, T& minVal, int& count)
+    {
+        minVal = arr[0];
+        count = 1;
+        for (int i = 1; i < size; i++) {
+            if (arr[i] < minVal) {
+                minVal = arr[i];
+                count = 1;
+            }
+            else if (arr[i] == minVal) {
+                count++;
+            }
         }
-        friend ostream& operator<<(ostream& os,
-            TLong& s);
-    };
+    }
 
-    ostream& operator<<(ostream& os, TLong& s) {
-        os << "H " << s.hi << ":L " << s.lo << "  ";
-        return os;
-    }
-    //  функція - шаблон
-    template <typename T>
-    T max(T x, T y, T z, T u) {
-        T t = x > y ? x : y;
-        T r = z > u ? z : u;
-        return t > r ? t : r;
-    }
-    // специфікація функції - шаблон для типу char*
-    template<>  char* max(char* x, char* y, char* z, char* u)
+    template<>
+    void findMinAndCount<char*>(char* arr[], int size, char*& minVal, int& count)
     {
-        char* t = strcmp(x, y) ? x : y;
-        char* r = strcmp(z, u) ? z : u;
-        return  strcmp(t, r) ? t : r;
+        minVal = arr[0];
+        count = 1;
+        for (int i = 1; i < size; i++) {
+            if (strcmp(arr[i], minVal) < 0) {
+                minVal = arr[i];
+                count = 1;
+            }
+            else if (strcmp(arr[i], minVal) == 0) {
+                count++;
+            }
+        }
     }
 
-
-    int fmain()
+   
+    int task1()
     {
-        cout << "template\n";
-        int  a = 5, b = 4, k;
-        double r, t = 3.5, q = 3.05;
-        char c, s = 'a', n = 'f';
-        TLong l, i(100, 50), j(50, 100), e(75, 75), f(4, 200);
-        k = max(a, 13, b, 5);   cout << "k= " << k << endl;
-        r = max(t, q, 3.45, 9.32); cout << "r= " << r << endl;
-        c = max(s, 'r', n, 'z');  cout << "c= " << c << endl;
-        l = max(i, j, e, f);    cout << "l= " << l << endl;
-        char* s1 = (char*)"text", * s2 = (char*)"txt", * s3 = (char*)"pltext",
-            * s4 = (char*)"room", * s5;
-        s5 = max<char*>(s1, s2, s3, s4); cout << " s5 =  " << s5 << endl;
+        int intArr[] = { 5, 3, 1, 3, 2, 5, 5, 1 };
+        int intMinVal, intCount;
+        findMinAndCount(intArr, 8, intMinVal, intCount);
+        std::cout << "minVal = " << intMinVal << ", count = " << intCount << std::endl;
+
+        double doubleArr[] = { 5.5, 3.3, 1.1, 3.3, 2.2, 5.5, 5.5 };
+        double doubleMinVal;
+        int doubleCount;
+        findMinAndCount(doubleArr, 7, doubleMinVal, doubleCount);
+        std::cout << "minVal = " << doubleMinVal << ", count = " << doubleCount << std::endl;
+
+        const char* strArr[] = { "bbb", "aaa", "ddd", "aaa", "ccc", "bbb", "bbb" };
+        const char* strMinVal;
+        int strCount;
+        findMinAndCount(strArr, 7, strMinVal, strCount);
+        std::cout << "minVal = " << strMinVal << ", count = " << strCount << std::endl;
+
         return 0;
     }
-
-
 }
-namespace Stk {
+
+namespace Task2 {
 
     using namespace std;
-    class TLong {    //  long long 8 -byte
-        long long hi, lo;  // 16 byte 
-    public:
-        TLong() :hi(0), lo(0) {}
-        TLong(long long h, long long l) :hi(h), lo(l) {}
-        TLong& operator = (const TLong& s) {
-            hi = s.hi; lo = s.lo; return *this;
-        };
-        bool      operator > (const TLong& s) {
-            if (hi > s.hi) return true;
-            if (hi == s.hi && lo >= s.lo) return true;
-            return false;
-        }
-        friend ostream& operator<<(ostream& os,
-            TLong& s);
-    };
-    ostream& operator<<(ostream& os, TLong& s) {
-        os << "H " << s.hi << ":L " << s.lo << "  ";
-        return os;
-    }
-    //  stack - шаблон
 
-
-    template <typename T = double, int SIZE = 100>   // <class T>
-    class stack_n
-    {
-        T m_stk[SIZE];   // Містить елементи стека.
-        int tos;        // Індекс вершини стека.
-    public:
-        stack_n() { tos = 0; }    // Ініціалізує стек.
-        void push(T obj);        // Заштовхує об'єкт у стек.
-        T pop() {        // Виштовхує об'єкт зі стека.
-            if (tos == 0) { cout << "Стек порожній.\n"; return 0; }
-            tos--; return m_stk[tos];
-        }
-    };
-    // Функція що визначається за межами класу
-    template <typename T, int SIZE>
-    void stack_n<T, SIZE>::push(T obj) {
-        if (tos == SIZE) { cout << "Стек повний. \n"; return; }
-        m_stk[tos] = obj; tos++;
+    template <typename T>
+    void sortArray(T arr[], int size) {
+        sort(arr, arr + size);
     }
 
-    typename char* pchar;
-    template <int SIZE>   // <class T>
-    class stack_n<char*, SIZE>
-    {
-        char* m_stk[SIZE];   // Містить елементи стека.
-        int tos;        // Індекс вершини стека.
-    public:
-        stack_n() { tos = 0; }    // Ініціалізує стек.
-        void push(char* obj);        // Заштовхує об'єкт у стек.
-        char* pop() {        // Виштовхує об'єкт зі стека.
-            if (tos == 0) { cout << "Стек порожній.\n"; return 0; }
-            tos--; return m_stk[tos];
+    template <typename T>
+    int binarySearch(T arr[], int size, T key) {
+        int low = 0, high = size - 1;
+        while (low <= high) {
+            int mid = (low + high) / 2;
+            if (arr[mid] == key) {
+                return mid;
+            }
+            else if (arr[mid] > key) {
+                high = mid - 1;
+            }
+            else {
+                low = mid + 1;
+            }
         }
-    };
-    // Функція що визначається за межами класу
-    template <int SIZE>
-    void stack_n<char*, SIZE>::push(char* obj) {
-        if (tos == SIZE) { cout << "Стек повний. \n"; return; }
-        m_stk[tos] = obj; tos++;
+        return -1;
     }
-    int smain()
-    {
-        int i;
-        setlocale(LC_CTYPE, "ukr");
-        std::cout << "Стек тести !\n";
-        stack_n<char, 10> s1, s2;
-        s1.push('a');  s2.push('x');  s1.push('b');
-        s2.push('y');  s1.push('c');  s2.push('z');
-        for (i = 0; i < 3; i++) cout << "Виштовхуємо s1: " << s1.pop() << "\n";
-        for (i = 0; i < 3; i++) cout << "Виштовхуємо s2: " << s2.pop() << "\n";
-        // Демонстрація стека дійсних чисел
-        stack_n<double> ds1, ds2; // Створюємо дві стеки дійсних чисел.
-        ds1.push(1.1);  ds2.push(2.2); ds1.push(3.3);
-        ds2.push(4.4);  ds1.push(5.5); ds2.push(6.6);
-        for (i = 0; i < 3; i++) cout << "Виштовхуємо ds1: " << ds1.pop() << "\n";
-        for (i = 0; i < 3; i++) cout << "Виштовхуємо ds2: " << ds2.pop() << "\n";
-        stack_n <TLong, 10> ln1, ln2;
-        ln1.push(TLong(5, 4));   ln1.push(TLong(50000, 4));   ln1.push(TLong(5, 400000));
-        ln2.push(TLong(3673865, 643287));   ln2.push(TLong(56748, 64374));   ln2.push(TLong(36287, 40530));
-        char* st1 = (char*)"text", * st2 = (char*)"txt", * st3 = (char*)"pltext",
-            * st4 = (char*)"room", * st5 = (char*)"text2";
 
-        stack_n <char*, 5> ss;
-        ss.push(st3); ss.push(st4); ss.push(st5); ss.push(st1);
-        ss.push(st2);
-        for (i = 0; i < 5; i++) cout << "Виштовхуємо ss: " << ss.pop() << "\n";
+    template <>
+    int binarySearch(char* arr[], int size, char* key) {
+        int low = 0, high = size - 1;
+        while (low <= high) {
+            int mid = (low + high) / 2;
+            int cmp = strcmp(arr[mid], key);
+            if (cmp == 0) {
+                return mid;
+            }
+            else if (cmp > 0) {
+                high = mid - 1;
+            }
+            else {
+                low = mid + 1;
+            }
+        }
+        return -1;
+    }
+
+    int main() {
+        int arr1[] = { 5, 2, 8, 1, 9 };
+        sortArray(arr1, 5);
+        for (int i = 0; i < 5; i++) {
+            cout << arr1[i] << " ";
+        }
+        cout << endl;
+
+        const char* arr2[] = { "some", "word", "Binary", "meet", "go", "test" };
+        sortArray(arr2, 6);
+        for (int i = 0; i < 6; i++) {
+            cout << arr2[i] << " ";
+        }
+        cout << endl;
+
+        int index1 = binarySearch(arr1, 5, 8);
+        cout << "Index of 8 in arr1: " << index1 << endl;
+
+        int index2 = binarySearch(arr1, 5, 3);
+        cout << "Index of 3(does not exist) in arr1: " << index2 << endl;
+
+        int index3 = binarySearch(arr2, 6, "test");
+        cout << "Index of 'test' in arr2: " << index3 << endl;
+
+        int index4 = binarySearch(arr2, 6, "foooo");
+        cout << "Index of 'foooo'(does not exist) in arr2: " << index4 << endl;
+
+        return 0;
+    }
+
+}
+
+namespace Task3 {
+    template<typename T>
+    class Matrix {
+    public:
+        Matrix(int rows, int cols) : rows_(rows), cols_(cols) {
+            data_ = new T * [rows_];
+            for (int i = 0; i < rows_; ++i) {
+                data_[i] = new T[cols_];
+                for (int j = 0; j < cols_; ++j) {
+                    data_[i][j] = T();
+                }
+            }
+        }
+
+        Matrix(const Matrix& other) : rows_(other.rows_), cols_(other.cols_) {
+            data_ = new T * [rows_];
+            for (int i = 0; i < rows_; ++i) {
+                data_[i] = new T[cols_];
+                for (int j = 0; j < cols_; ++j) {
+                    data_[i][j] = other.data_[i][j];
+                }
+            }
+        }
+
+        ~Matrix() {
+            for (int i = 0; i < rows_; ++i) {
+                delete[] data_[i];
+            }
+            delete[] data_;
+        }
+
+        Matrix& operator=(const Matrix& other) {
+            if (&other != this) {
+                Matrix temp(other);
+                std::swap(rows_, temp.rows_);
+                std::swap(cols_, temp.cols_);
+                std::swap(data_, temp.data_);
+            }
+            return *this;
+        }
+
+        T* operator[](int row) const {
+            if (row < 0 || row >= rows_) {
+                throw std::out_of_range("Matrix row index out of range");
+            }
+            return data_[row];
+        }
+
+        Matrix operator+(const Matrix& other) const {
+            if (rows_ != other.rows_ || cols_ != other.cols_) {
+                throw std::invalid_argument("Matrices have different dimensions");
+            }
+            Matrix result(rows_, cols_);
+            for (int i = 0; i < rows_; ++i) {
+                for (int j = 0; j < cols_; ++j) {
+                    result[i][j] = (*this)[i][j] + other[i][j];
+                }
+            }
+            return result;
+        }
+
+        Matrix& operator+=(const Matrix& other) {
+            if (rows_ != other.rows_ || cols_ != other.cols_) {
+                throw std::invalid_argument("Matrices have different dimensions");
+            }
+            for (int i = 0; i < rows_; ++i) {
+                for (int j = 0; j < cols_; ++j) {
+                    (*this)[i][j] += other[i][j];
+                }
+            }
+            return *this;
+        }
+
+    private:
+        int rows_;
+        int cols_;
+        T** data_;
+    };
+
+    int main() {
+        Matrix<int> m(3, 3);
+
+        m[0][0] = 1;
+        m[1][1] = 2;
+        m[2][2] = 3;
+
+        Matrix<int> m_copy = m;
+
+        std::cout << "m[0][0] = 1;\n";
+        std::cout << "m[1][1] = 2;\n";
+        std::cout << "m[2][2] = 3;\n";
+
+        std::cout << "Before\n\n";
+
+        for (int i = 0; i < 3; ++i) {
+            for (int j = 0; j < 3; ++j) {
+                std::cout << m[i][j] << " ";
+            }
+            std::cout << std::endl;
+        }
+
+        std::cout << std::endl;
+
+   
+        m += m_copy;
+
+        std::cout << "After the copy and +=m_copy\n\n";
+
+        for (int i = 0; i < 3; ++i) {
+            for (int j = 0; j < 3; ++j) {
+                std::cout << m[i][j] << " ";
+            }
+            std::cout << std::endl;
+        }
+
+        std::cout << std::endl;
+        std::cout << "Use m[2][2]   ->   " << m[2][2];
+
         return 0;
     }
 }
-void example()
+
+namespace Task4 {
+    template <typename T>
+    class List {
+    private:
+        struct Node {
+            T value;
+            Node* next;
+        };
+
+        Node* head;
+        Node* tail;
+        int size;
+
+    public:
+        List() : head(nullptr), tail(nullptr), size(0) {}
+
+        void push_front(const T& value) {
+            Node* new_node = new Node{ value, head };
+            head = new_node;
+            if (tail == nullptr) {
+                tail = new_node;
+            }
+            ++size;
+        }
+
+        void push_back(const T& value) {
+            Node* new_node = new Node{ value, nullptr };
+            if (tail == nullptr) {
+                head = new_node;
+                tail = new_node;
+            }
+            else {
+                tail->next = new_node;
+                tail = new_node;
+            }
+            ++size;
+        }
+
+        void pop_front() {
+            if (head != nullptr) {
+                Node* old_head = head;
+                head = head->next;
+                delete old_head;
+                --size;
+                if (head == nullptr) {
+                    tail = nullptr;
+                }
+            }
+        }
+
+        void pop_back() {
+            if (tail != nullptr) {
+                if (head == tail) {
+                    delete tail;
+                    head = nullptr;
+                    tail = nullptr;
+                    --size;
+                }
+                else {
+                    Node* curr = head;
+                    while (curr->next != tail) {
+                        curr = curr->next;
+                    }
+                    delete tail;
+                    tail = curr;
+                    tail->next = nullptr;
+                    --size;
+                }
+            }
+        }
+
+        int get_size() const {
+            return size;
+        }
+
+        class iterator {
+        public:
+            iterator(Node* node) : curr(node) {}
+
+            T& operator*() const {
+                return curr->value;
+            }
+
+            iterator& operator++() {
+                curr = curr->next;
+                return *this;
+            }
+
+            bool operator==(const iterator& other) const {
+                return curr == other.curr;
+            }
+
+            bool operator!=(const iterator& other) const {
+                return curr != other.curr;
+            }
+
+        private:
+            Node* curr;
+        };
+
+        iterator begin() const {
+            return iterator(head);
+        }
+
+        iterator end() const {
+            return iterator(nullptr);
+        }
+    };
+
+    int main() {
+        List<double> my_list;
+        my_list.push_back(3.14);
+        my_list.push_back(2.22);
+        my_list.push_back(0.9999);
+        my_list.push_back(5.9999);
+
+        for (auto it = my_list.begin(); it != my_list.end(); ++it) {
+            std::cout << *it << std::endl;
+        }
+
+        return 0;
+    }
+}
+
+void task1()
 {
-    Fun::fmain();
-    Stk::smain();
+    Task1::task1();
+    
+}
+
+void task2()
+{
+    Task2::main();
+}
+
+void task3()
+{
+    Task3::main();
+}
+
+void task4()
+{
+    Task4::main();
 }

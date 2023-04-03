@@ -7,8 +7,28 @@ int main()
 {
     int r;       
     std::cout << "Lab 8 \n";
-     std::cout << " Run example press 1 \n";
-     std::cin >> r; if (r == 1) example();
+     std::cout << " Enter number task \n";
+     std::cin >> r;
+     switch (r)
+     {
+     case 1:
+         task1();
+         break;
+
+     case 2:
+         task2();
+         break;
+
+     case 3:
+         task3();
+         break;
+
+     case 4:
+         task4();
+         break;
+     default:
+         break;
+     }
     
 }
 
